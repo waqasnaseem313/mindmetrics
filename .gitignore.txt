@@ -1,0 +1,165 @@
+# =================================
+# MINDMETRICS PSYCHOLOGY APP .gitignore
+# =================================
+
+# =================================
+# OPERATING SYSTEM FILES
+# =================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.com.apple.timemachine.supported
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msm
+*.msp
+
+# Linux
+.directory
+*~
+.fuse_hidden*
+.nfs*
+.rnd
+.swp
+.swx
+
+# =================================
+# EDITOR & IDE FILES
+# =================================
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# Sublime Text
+*.sublime-workspace
+*.sublime-project
+sftp-config.json
+sftp-config-alt*.json
+
+# Atom
+.idea/
+*.iml
+.atom/
+.buildlog
+.history
+.sass-cache
+*.swp
+*~
+
+# Notepad++
+*.bak
+
+# =================================
+# TEMPORARY & CACHE FILES
+# =================================
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional stylelint cache
+.stylelintcache
+
+# =================================
+# BUILD & OUTPUT FILES
+# =================================
+# Build directories
+dist/
+build/
+out/
+.coverage/
+.nyc_output/
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# Production
+.cache/
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# =================================
+# PROJECT-SPECIFIC
+# =================================
+# CSV data files (if you want to keep them local)
+# Uncomment if you want to ignore CSV data files
+# *.csv
+
+# PDF reports generated locally
+# Uncomment if you want to ignore generated reports
+# reports/*.pdf
+# reports/*.docx
+
+# Session data
+session.json
+temp/
+
+# =================================
+# TESTING
+# =================================
+# Jest
+jest.config.js
+__tests__/
+__mocks__/
+
+# =================================
+# MISC
+# =================================
+# Secrets
+*.pem
+*.key
+*.crt
+*.cer
+
+# Large media files (add your own patterns)
+*.mp4
+*.mov
+*.avi
+*.wmv
+
+# =================================
+# DOCUMENTATION
+# =================================
+# Documentation builds
+docs/_build/
+docs/_static/
+docs/_templates/
