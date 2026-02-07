@@ -1,0 +1,2502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧠 MindMetrics - Professional Psychology Assessment Platform</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/docx@7.8.2/build/index.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --gray: #64748b;
+        }
+        
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--dark);
+        }
+        
+        .container {
+            max-width: 1200px; 
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 30px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            padding: 40px 30px; 
+            text-align: center; 
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header h1 { 
+            font-size: 3em; 
+            font-weight: 900; 
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .header p { 
+            font-size: 1.2em; 
+            opacity: 0.95; 
+            font-weight: 300;
+        }
+        
+        .content { 
+            padding: 40px; 
+        }
+        
+        /* Scale Selector */
+        .scale-selector {
+            background: linear-gradient(135deg, #e0f2fe 0%, #f3e8ff 100%);
+            padding: 40px; 
+            border-radius: 25px; 
+            margin-bottom: 30px;
+            text-align: center; 
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        
+        .scale-selector h2 {
+            color: var(--dark);
+            margin-bottom: 30px;
+            font-size: 2em;
+            font-weight: 700;
+        }
+        
+        .scale-selector select {
+            background: white; 
+            border: 2px solid var(--primary);
+            border-radius: 15px; 
+            padding: 15px 25px; 
+            font-size: 1.1em;
+            font-weight: 500; 
+            width: 80%; 
+            max-width: 500px; 
+            margin-bottom: 20px;
+            cursor: pointer;
+            color: var(--dark);
+        }
+        
+        /* Buttons */
+        .btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white; 
+            border: none; 
+            padding: 15px 30px;
+            border-radius: 50px; 
+            font-size: 1em; 
+            font-weight: 600;
+            cursor: pointer; 
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 5px;
+        }
+        
+        .btn:hover { 
+            transform: translateY(-3px); 
+            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4); 
+        }
+        
+        .btn-download { 
+            background: linear-gradient(135deg, var(--success) 0%, #059669 100%); 
+        }
+        
+        .btn-success { 
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); 
+        }
+        
+        .btn-warning { 
+            background: linear-gradient(135deg, var(--warning) 0%, #d97706 100%); 
+        }
+        
+        .btn-info { 
+            background: linear-gradient(135deg, var(--info) 0%, #1d4ed8 100%); 
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--gray) 0%, #475569 100%);
+        }
+        
+        /* Sections */
+        .section { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 20px; 
+            margin: 25px 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); 
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .section.hidden { 
+            display: none; 
+        }
+        
+        /* CSV Zone */
+        .csv-zone {
+            border: 3px dashed var(--primary); 
+            border-radius: 20px; 
+            padding: 30px;
+            text-align: center; 
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05));
+        }
+        
+        .csv-instructions {
+            background: rgba(248, 250, 252, 0.9);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px auto;
+            max-width: 800px;
+            text-align: left;
+        }
+        
+        /* Question Cards */
+        .question-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 25px; 
+            margin: 20px 0; 
+            border-radius: 20px;
+            border-left: 5px solid var(--primary); 
+            transition: all 0.3s ease;
+        }
+        
+        .question-card:hover { 
+            transform: translateX(5px); 
+        }
+        
+        .question-number {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 35px;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+        
+        .question-text {
+            font-size: 1.1em;
+            font-weight: 500;
+            color: var(--dark);
+            line-height: 1.5;
+        }
+        
+        .question-options {
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px; 
+            margin-top: 20px;
+        }
+        
+        .radio-option {
+            background: white; 
+            border: 2px solid #e2e8f0; 
+            padding: 15px 20px;
+            border-radius: 15px; 
+            text-align: center; 
+            cursor: pointer;
+            transition: all 0.3s ease; 
+            font-weight: 500;
+        }
+        
+        .radio-option:hover {
+            transform: translateY(-3px);
+            border-color: var(--primary);
+        }
+        
+        .radio-label {
+            display: block; 
+            padding: 10px; 
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-size: 0.95em;
+            text-align: center;
+        }
+        
+        .radio-value {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+        
+        .radio-option input[type="radio"] {
+            display: none;
+        }
+        
+        .radio-option input[type="radio"]:checked + .radio-label {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white; 
+            border-color: var(--primary);
+            transform: scale(1.05);
+        }
+        
+        /* Results Section */
+        .results-card { 
+            background: linear-gradient(135deg, #e0f2fe 0%, #f3e8ff 100%); 
+            border: none; 
+        }
+        
+        /* Score Display */
+        .score-display {
+            text-align: center;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            margin: 20px 0;
+        }
+        
+        .score-circle {
+            width: 180px; 
+            height: 180px; 
+            border-radius: 50%;
+            background: conic-gradient(
+                var(--success) 0deg var(--angle, 0deg), 
+                #e2e8f0 var(--angle, 0deg) 360deg
+            );
+            margin: 30px auto; 
+            display: flex; 
+            align-items: center;
+            justify-content: center; 
+            font-size: 2.5em; 
+            font-weight: 800;
+            color: var(--dark); 
+            position: relative;
+        }
+        
+        .score-circle::after {
+            content: ''; 
+            position: absolute; 
+            width: 160px; 
+            height: 160px;
+            border-radius: 50%; 
+            background: white;
+        }
+        
+        .score-circle span {
+            position: relative; 
+            z-index: 1; 
+            background: white;
+            width: 150px; 
+            height: 150px; 
+            border-radius: 50%;
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            font-size: 2.2em;
+            font-weight: 800;
+            color: var(--primary);
+        }
+        
+        /* Interpretation Report */
+        .interpretation-report {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            margin: 30px 0;
+            text-align: left;
+        }
+        
+        .report-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: var(--light);
+            border-radius: 15px;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .severity-indicator {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin: 10px 0;
+        }
+        
+        .low { background: var(--success); color: white; }
+        .mild { background: #8b5cf6; color: white; }
+        .moderate { background: var(--warning); color: white; }
+        .severe { background: var(--danger); color: white; }
+        
+        /* Scale Info */
+        .scale-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(139, 92, 246, 0.08));
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+        
+        .scale-info-item {
+            text-align: center;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+        }
+        
+        /* Progress Bar */
+        .progress-container {
+            width: 100%;
+            height: 10px;
+            background: #e2e8f0;
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 5px;
+            transition: width 0.5s ease;
+            width: 0%;
+        }
+        
+        /* Batch Results */
+        .batch-results-container {
+            margin-top: 30px;
+        }
+        
+        .participant-results {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 15px 0;
+            border-left: 4px solid var(--primary);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        .results-table th {
+            background: var(--primary);
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        .results-table td {
+            padding: 10px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .results-table tr:hover {
+            background: #f8fafc;
+        }
+        
+        /* Alert Messages */
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .alert-success {
+            background: #d1fae5;
+            border-left: 4px solid var(--success);
+            color: #065f46;
+        }
+        
+        .alert-warning {
+            background: #fef3c7;
+            border-left: 4px solid var(--warning);
+            color: #92400e;
+        }
+        
+        .alert-info {
+            background: #dbeafe;
+            border-left: 4px solid var(--info);
+            color: #1e40af;
+        }
+        
+        .alert-danger {
+            background: #fee2e2;
+            border-left: 4px solid var(--danger);
+            color: #dc2626;
+        }
+        
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            flex-direction: column;
+        }
+        
+        .loading-overlay.active {
+            display: flex;
+        }
+        
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(99, 102, 241, 0.2);
+            border-top: 5px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .content { padding: 20px; }
+            .scale-selector select { width: 100%; }
+            .question-options { grid-template-columns: 1fr; }
+            .scale-info { grid-template-columns: 1fr; }
+            .btn { width: 100%; margin: 10px 0; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <p style="color: var(--primary); font-weight: 600;">Loading scale...</p>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-brain"></i> MindMetrics</h1>
+            <p>Professional Psychology Assessment Platform</p>
+        </div>
+        
+        <div class="content">
+            <!-- Scale Selection -->
+            <div class="scale-selector">
+                <h2>Select Assessment Scale</h2>
+                <select id="scaleSelect">
+                    <option value="">🎯 Choose Assessment Scale</option>
+                    <option value="pss">📊 Perceived Stress Scale (PSS-10)</option>
+                    <option value="gad7">😰 GAD-7 Anxiety Scale</option>
+                    <option value="phq9">😔 PHQ-9 Depression Scale</option>
+                    <option value="dass21">⚡ DASS-21 (Stress/Anxiety/Depression)</option>
+                    <option value="epds">👶 Edinburgh Postnatal Depression Scale (EPDS)</option>
+                    <option value="audit">🍺 AUDIT (Alcohol Use)</option>
+                    <option value="k10">📈 Kessler Psychological Distress Scale (K10)</option>
+                    <option value="pades">🎭 PAD Emotion Scales</option>
+                    <option value="poms">😤 Profile of Mood States (POMS)</option>
+                    <option value="panas">⚖️ PANAS (Positive/Negative Affect)</option>
+                    <option value="spane">📊 SPANE (Experience Balance)</option>
+                    <option value="maacl">📝 MAACL-R Affect Checklist</option>
+                    <option value="brums">🏃 BRUMS (Athlete Mood)</option>
+                </select>
+                <br><br>
+                <button class="btn" id="launchBtn">
+                    <i class="fas fa-rocket"></i> Launch Assessment
+                </button>
+            </div>
+
+            <!-- CSV Upload Section -->
+            <div id="csvSection" class="section hidden">
+                <div class="csv-zone">
+                    <h3><i class="fas fa-file-csv"></i> Batch Analysis</h3>
+                    <p>Upload CSV with responses for multiple participants</p>
+                    
+                    <div class="csv-instructions">
+                        <h4>📋 Instructions:</h4>
+                        <ol>
+                            <li><strong>Download the template</strong> using the button below</li>
+                            <li><strong>Fill in responses</strong> for each question (use the scoring scale shown)</li>
+                            <li><strong>Save as CSV</strong> and upload using the button below</li>
+                            <li><strong>Each row</strong> represents one participant</li>
+                            <li><strong>Click "Process Batch File"</strong> to analyze all participants</li>
+                        </ol>
+                        <div style="margin-top: 15px; padding: 10px; background: #f1f5f9; border-radius: 8px;">
+                            <strong>Note:</strong> The CSV should have columns: ParticipantID, Date, Notes, Q1, Q2, Q3, etc.
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-download" id="downloadTemplateBtn">
+                        <i class="fas fa-download"></i> Download Template
+                    </button>
+                    <br><br>
+                    
+                    <div style="margin: 20px 0;">
+                        <input type="file" id="csvFile" accept=".csv" style="display:none;">
+                        <button class="btn" id="uploadCsvBtn">
+                            <i class="fas fa-upload"></i> Choose CSV File
+                        </button>
+                        <span id="fileName" style="margin-left:15px; color:var(--gray);">No file chosen</span>
+                    </div>
+                    
+                    <div id="csvPreview" class="hidden" style="margin-top:20px; text-align:left;">
+                        <h4>File Preview (First 5 rows):</h4>
+                        <div id="previewTable" style="overflow-x: auto;"></div>
+                    </div>
+                    
+                    <div id="batchControls" class="hidden" style="margin-top: 30px;">
+                        <button class="btn btn-success" id="processBatchBtn">
+                            <i class="fas fa-play"></i> Process Batch File
+                        </button>
+                        <button class="btn btn-secondary" id="clearCsvBtn">
+                            <i class="fas fa-times"></i> Clear File
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Questionnaire -->
+            <div id="questionnaire" class="section hidden">
+                <h2 id="scaleTitle" style="color:var(--dark); margin-bottom:30px;"></h2>
+                
+                <div class="scale-info">
+                    <div class="scale-info-item">
+                        <div>Scoring Range</div>
+                        <div id="scoringRange" style="font-weight:600; color:var(--primary);"></div>
+                    </div>
+                    <div class="scale-info-item">
+                        <div>Questions</div>
+                        <div id="questionCount" style="font-weight:600; color:var(--primary);"></div>
+                    </div>
+                    <div class="scale-info-item">
+                        <div>Max Score</div>
+                        <div id="maxScore" style="font-weight:600; color:var(--primary);"></div>
+                    </div>
+                </div>
+                
+                <div style="margin:30px 0;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                        <span>Progress</span>
+                        <span id="progressText">0%</span>
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress-bar" id="progressBar"></div>
+                    </div>
+                </div>
+                
+                <form id="quizForm"></form>
+                
+                <div style="text-align:center; margin-top:40px;">
+                    <button class="btn btn-success" id="calculateBtn">
+                        <i class="fas fa-calculator"></i> Calculate Results
+                    </button>
+                    <button class="btn" id="resetBtn">
+                        <i class="fas fa-redo"></i> Reset
+                    </button>
+                </div>
+            </div>
+
+            <!-- Individual Results Section -->
+            <div id="results" class="section hidden results-card">
+                <div id="scoreDisplay"></div>
+                
+                <div id="interpretationReport" class="interpretation-report hidden">
+                    <h3><i class="fas fa-chart-line"></i> Detailed Interpretation Report</h3>
+                    <div id="reportContent"></div>
+                </div>
+                
+                <div style="text-align:center; margin:40px 0;">
+                    <button class="btn btn-warning" id="interpretBtn">
+                        <i class="fas fa-chart-line"></i> View Detailed Analysis
+                    </button>
+                    <button class="btn btn-download" id="exportPdfBtn">
+                        <i class="fas fa-file-pdf"></i> Export PDF Report
+                    </button>
+                    <button class="btn btn-info" id="exportDocxBtn">
+                        <i class="fas fa-file-word"></i> Export DOCX Report
+                    </button>
+                    <button class="btn" id="newAssessmentBtn">
+                        <i class="fas fa-plus"></i> New Assessment
+                    </button>
+                </div>
+                
+                <div style="background:rgba(255,255,255,0.9); padding:20px; border-radius:15px; color:var(--gray); text-align:center;">
+                    <i class="fas fa-exclamation-triangle"></i> 
+                    <strong>Disclaimer:</strong> This is a screening tool only. Consult a healthcare professional for diagnosis.
+                </div>
+            </div>
+
+            <!-- Batch Results Section -->
+            <div id="batchResults" class="section hidden">
+                <h2 style="color:var(--dark); margin-bottom:30px;">
+                    <i class="fas fa-users"></i> Batch Processing Results
+                </h2>
+                
+                <div id="batchSummary" class="batch-results-container">
+                    <!-- Batch summary will be inserted here -->
+                </div>
+                
+                <div id="individualBatchResults" class="batch-results-container">
+                    <!-- Individual participant results will be inserted here -->
+                </div>
+                
+                <div style="text-align:center; margin-top:40px;">
+                    <button class="btn btn-download" id="exportBatchPdfBtn">
+                        <i class="fas fa-file-pdf"></i> Export Batch Report
+                    </button>
+                    <button class="btn" id="backToCsvBtn">
+                        <i class="fas fa-arrow-left"></i> Back to CSV Upload
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== COMPLETE SCALES DEFINITION ====================
+        const scales = {
+            pss: {
+                key: 'pss', 
+                title: "Perceived Stress Scale (PSS-10)", 
+                description: "Measures the degree to which situations in one's life are appraised as stressful.",
+                questions: [
+                    "In the last month, how often have you been upset because of something that happened unexpectedly?",
+                    "In the last month, how often have you felt that you were unable to control the important things in your life?",
+                    "In the last month, how often have you felt nervous and 'stressed'?",
+                    "In the last month, how often have you felt confident about your ability to handle your personal problems?",
+                    "In the last month, how often have you felt that things were going your way?",
+                    "In the last month, how often have you found that you could not cope with all the things that you had to do?",
+                    "In the last month, how often have you been able to control irritations in your life?",
+                    "In the last month, how often have you felt that you were on top of things?",
+                    "In the last month, how often have you been angered because of things that happened that were outside of your control?",
+                    "In the last month, how often have you felt difficulties were piling up so high that you could not overcome them?"
+                ],
+                maxScore: 40, 
+                scoring: '0-4',
+                options: ['Never (0)', 'Almost Never (1)', 'Sometimes (2)', 'Fairly Often (3)', 'Very Often (4)'],
+                reverseItems: [4, 5, 7, 8],
+                interpretation: function(score) {
+                    if (score <= 13) return {
+                        severity: "Low Stress",
+                        level: "low",
+                        description: "You are experiencing low levels of perceived stress. This suggests you are managing life's challenges effectively.",
+                        recommendations: [
+                            "Continue your current stress management practices",
+                            "Maintain healthy lifestyle habits",
+                            "Practice regular mindfulness or meditation"
+                        ]
+                    };
+                    if (score <= 26) return {
+                        severity: "Moderate Stress",
+                        level: "moderate",
+                        description: "You are experiencing moderate levels of stress. Consider implementing additional stress management strategies.",
+                        recommendations: [
+                            "Practice regular relaxation techniques",
+                            "Increase physical activity",
+                            "Improve time management skills",
+                            "Consider talking to a professional"
+                        ]
+                    };
+                    return {
+                        severity: "High Stress",
+                        level: "severe",
+                        description: "You are experiencing high levels of perceived stress. Professional support may be beneficial.",
+                        recommendations: [
+                            "Seek professional counseling",
+                            "Practice stress reduction techniques daily",
+                            "Consider lifestyle changes",
+                            "Build a strong support network"
+                        ]
+                    };
+                }
+            },
+            
+            gad7: {
+                key: 'gad7', 
+                title: "GAD-7 Anxiety Scale",
+                description: "Screens for and measures the severity of generalized anxiety disorder.",
+                questions: [
+                    "Feeling nervous, anxious, or on edge",
+                    "Not being able to stop or control worrying",
+                    "Worrying too much about different things",
+                    "Trouble relaxing",
+                    "Being so restless that it's hard to sit still",
+                    "Becoming easily annoyed or irritable",
+                    "Feeling afraid as if something awful might happen"
+                ],
+                maxScore: 21, 
+                scoring: '0-3',
+                options: ['Not at all (0)', 'Several days (1)', 'More than half the days (2)', 'Nearly every day (3)'],
+                interpretation: function(score) {
+                    if (score <= 4) return {
+                        severity: "Minimal Anxiety",
+                        level: "low",
+                        description: "Your anxiety symptoms are minimal. No significant anxiety concerns detected.",
+                        recommendations: [
+                            "Continue current practices",
+                            "Monitor symptoms periodically",
+                            "Maintain healthy lifestyle"
+                        ]
+                    };
+                    if (score <= 9) return {
+                        severity: "Mild Anxiety",
+                        level: "mild",
+                        description: "You are experiencing mild anxiety symptoms that may warrant monitoring.",
+                        recommendations: [
+                            "Practice relaxation techniques",
+                            "Regular exercise",
+                            "Cognitive behavioral techniques",
+                            "Monitor symptoms"
+                        ]
+                    };
+                    if (score <= 14) return {
+                        severity: "Moderate Anxiety",
+                        level: "moderate",
+                        description: "You are experiencing moderate anxiety symptoms. Professional evaluation may be helpful.",
+                        recommendations: [
+                            "Consider professional evaluation",
+                            "Cognitive behavioral therapy",
+                            "Regular exercise program",
+                            "Stress management training"
+                        ]
+                    };
+                    return {
+                        severity: "Severe Anxiety",
+                        level: "severe",
+                        description: "You are experiencing severe anxiety symptoms. Professional assessment is recommended.",
+                        recommendations: [
+                            "Seek professional assessment immediately",
+                            "Consider therapy or counseling",
+                            "Discuss treatment options with healthcare provider",
+                            "Develop comprehensive treatment plan"
+                        ]
+                    };
+                }
+            },
+            
+            phq9: {
+                key: 'phq9', 
+                title: "PHQ-9 Depression Scale",
+                description: "Measures depression severity and monitors treatment response.",
+                questions: [
+                    "Little interest or pleasure in doing things",
+                    "Feeling down, depressed, or hopeless",
+                    "Trouble falling or staying asleep, or sleeping too much",
+                    "Feeling tired or having little energy",
+                    "Poor appetite or overeating",
+                    "Feeling bad about yourself — or that you are a failure or have let yourself or your family down",
+                    "Trouble concentrating on things, such as reading the newspaper or watching television",
+                    "Moving or speaking so slowly that other people could have noticed? Or the opposite — being so fidgety or restless that you have been moving around a lot more than usual",
+                    "Thoughts that you would be better off dead or of hurting yourself in some way"
+                ],
+                maxScore: 27, 
+                scoring: '0-3',
+                options: ['Not at all (0)', 'Several days (1)', 'More than half the days (2)', 'Nearly every day (3)'],
+                interpretation: function(score) {
+                    if (score <= 4) return {
+                        severity: "Minimal Depression",
+                        level: "low",
+                        description: "Your depression symptoms are minimal. No significant depression concerns detected.",
+                        recommendations: [
+                            "Continue current wellness practices",
+                            "Maintain social connections",
+                            "Regular physical activity"
+                        ]
+                    };
+                    if (score <= 9) return {
+                        severity: "Mild Depression",
+                        level: "mild",
+                        description: "You are experiencing mild depression symptoms that may warrant monitoring.",
+                        recommendations: [
+                            "Increase physical activity",
+                            "Improve sleep hygiene",
+                            "Social engagement",
+                            "Consider professional support"
+                        ]
+                    };
+                    if (score <= 14) return {
+                        severity: "Moderate Depression",
+                        level: "moderate",
+                        description: "You are experiencing moderate depression symptoms. Professional evaluation is recommended.",
+                        recommendations: [
+                            "Seek professional evaluation",
+                            "Consider therapy",
+                            "Regular exercise program",
+                            "Monitor symptoms closely"
+                        ]
+                    };
+                    if (score <= 19) return {
+                        severity: "Moderately Severe Depression",
+                        level: "severe",
+                        description: "You are experiencing moderately severe depression symptoms. Professional assessment is important.",
+                        recommendations: [
+                            "Immediate professional assessment",
+                            "Consider combination treatment",
+                            "Regular monitoring",
+                            "Build support network"
+                        ]
+                    };
+                    return {
+                        severity: "Severe Depression",
+                        level: "severe",
+                        description: "You are experiencing severe depression symptoms. Immediate professional assessment is recommended.",
+                        recommendations: [
+                            "Seek immediate professional help",
+                            "Discuss treatment options urgently",
+                            "Safety planning if needed",
+                            "Regular follow-up"
+                        ]
+                    };
+                }
+            },
+            
+            dass21: {
+                key: 'dass21', 
+                title: "Depression Anxiety Stress Scales (DASS-21)",
+                description: "Measures depression, anxiety, and stress symptoms over the past week.",
+                questions: [
+                    "I found it hard to wind down",
+                    "I was aware of dryness of my mouth",
+                    "I couldn't seem to experience any positive feeling at all",
+                    "I experienced breathing difficulty (e.g., excessively rapid breathing, breathlessness)",
+                    "I found it difficult to work up the initiative to do things",
+                    "I tended to over-react to situations",
+                    "I experienced trembling (e.g., in the hands)",
+                    "I felt that I was using a lot of nervous energy",
+                    "I was worried about situations in which I might panic and make a fool of myself",
+                    "I felt that I had nothing to look forward to",
+                    "I found myself getting agitated",
+                    "I found it difficult to relax",
+                    "I felt down-hearted and blue",
+                    "I was intolerant of anything that kept me from getting on with what I was doing",
+                    "I felt I was close to panic",
+                    "I was unable to become enthusiastic about anything",
+                    "I felt I wasn't worth much as a person",
+                    "I felt that I was rather touchy",
+                    "I was aware of the action of my heart in the absence of physical exertion",
+                    "I felt scared without any good reason",
+                    "I felt that life was meaningless"
+                ],
+                maxScore: 63, 
+                scoring: '0-3',
+                options: ['Did not apply to me at all (0)', 'Applied to me to some degree, or some of the time (1)', 'Applied to me to a considerable degree, or a good part of time (2)', 'Applied to me very much, or most of the time (3)'],
+                subscales: {
+                    depression: [3, 5, 10, 13, 16, 17, 21],
+                    anxiety: [2, 4, 7, 9, 15, 19, 20],
+                    stress: [1, 6, 8, 11, 12, 14, 18]
+                },
+                interpretation: function(scores) {
+                    const depression = scores.depression;
+                    const anxiety = scores.anxiety;
+                    const stress = scores.stress;
+                    
+                    let overallLevel = "low";
+                    if (depression > 14 || anxiety > 10 || stress > 19) overallLevel = "severe";
+                    else if (depression > 10 || anxiety > 8 || stress > 15) overallLevel = "moderate";
+                    else if (depression > 7 || anxiety > 5 || stress > 10) overallLevel = "mild";
+                    
+                    return {
+                        severity: "Mixed Symptoms",
+                        level: overallLevel,
+                        description: `Depression: ${depression}/21, Anxiety: ${anxiety}/21, Stress: ${stress}/21`,
+                        recommendations: [
+                            "Comprehensive psychological assessment recommended",
+                            "Consider therapy focusing on identified areas",
+                            "Regular monitoring of all three domains",
+                            "Practice stress management techniques"
+                        ]
+                    };
+                }
+            },
+            
+            epds: {
+                key: 'epds', 
+                title: "Edinburgh Postnatal Depression Scale (EPDS)",
+                description: "Screens for postnatal depression in women who have recently had a baby.",
+                questions: [
+                    "I have been able to laugh and see the funny side of things",
+                    "I have looked forward with enjoyment to things",
+                    "I have blamed myself unnecessarily when things went wrong",
+                    "I have been anxious or worried for no good reason",
+                    "I have felt scared or panicky for no very good reason",
+                    "Things have been getting on top of me",
+                    "I have been so unhappy that I have had difficulty sleeping",
+                    "I have felt sad or miserable",
+                    "I have been so unhappy that I have been crying",
+                    "The thought of harming myself has occurred to me"
+                ],
+                maxScore: 30, 
+                scoring: '0-3',
+                options: ['As much as I always could (0)', 'Not quite so much now (1)', 'Definitely not so much now (2)', 'Not at all (3)'],
+                reverseItems: [1, 2],
+                interpretation: function(score) {
+                    if (score <= 9) return {
+                        severity: "Unlikely Depression",
+                        level: "low",
+                        description: "Your score suggests you are unlikely to be suffering from postnatal depression.",
+                        recommendations: [
+                            "Continue self-care practices",
+                            "Maintain support network",
+                            "Monitor mood changes"
+                        ]
+                    };
+                    if (score <= 12) return {
+                        severity: "Possible Depression",
+                        level: "moderate",
+                        description: "Your score suggests possible postnatal depression. Further assessment is recommended.",
+                        recommendations: [
+                            "Seek professional assessment",
+                            "Increase social support",
+                            "Practice self-care"
+                        ]
+                    };
+                    return {
+                        severity: "Probable Depression",
+                        level: "severe",
+                        description: "Your score suggests probable postnatal depression. Professional help is recommended.",
+                        recommendations: [
+                            "Seek immediate professional help",
+                            "Discuss with healthcare provider",
+                            "Build strong support system"
+                        ]
+                    };
+                }
+            },
+            
+            audit: {
+                key: 'audit', 
+                title: "Alcohol Use Disorders Identification Test (AUDIT)",
+                description: "Screens for hazardous and harmful alcohol consumption.",
+                questions: [
+                    "How often do you have a drink containing alcohol?",
+                    "How many drinks containing alcohol do you have on a typical day when you are drinking?",
+                    "How often do you have six or more drinks on one occasion?",
+                    "How often during the last year have you found that you were not able to stop drinking once you had started?",
+                    "How often during the last year have you failed to do what was normally expected from you because of drinking?",
+                    "How often during the last year have you needed a first drink in the morning to get yourself going after a heavy drinking session?",
+                    "How often during the last year have you had a feeling of guilt or remorse after drinking?",
+                    "How often during the last year have you been unable to remember what happened the night before because you had been drinking?",
+                    "Have you or someone else been injured as a result of your drinking?",
+                    "Has a relative or friend or doctor or other health worker been concerned about your drinking or suggested you cut down?"
+                ],
+                maxScore: 40, 
+                scoring: '0-4',
+                options: ['Never (0)', 'Monthly or less (1)', '2-4 times a month (2)', '2-3 times a week (3)', '4 or more times a week (4)'],
+                interpretation: function(score) {
+                    if (score <= 7) return {
+                        severity: "Low Risk",
+                        level: "low",
+                        description: "Your alcohol consumption is within low-risk limits.",
+                        recommendations: [
+                            "Continue responsible drinking habits",
+                            "Stay within recommended limits",
+                            "Regular self-assessment"
+                        ]
+                    };
+                    if (score <= 15) return {
+                        severity: "Hazardous Use",
+                        level: "moderate",
+                        description: "Your drinking pattern may be hazardous to your health.",
+                        recommendations: [
+                            "Reduce alcohol consumption",
+                            "Set drinking limits",
+                            "Consider professional advice"
+                        ]
+                    };
+                    if (score <= 19) return {
+                        severity: "Harmful Use",
+                        level: "severe",
+                        description: "Your drinking is causing harm to your health.",
+                        recommendations: [
+                            "Seek professional help",
+                            "Consider abstinence",
+                            "Join support group"
+                        ]
+                    };
+                    return {
+                        severity: "Dependence Likely",
+                        level: "severe",
+                        description: "Your score suggests possible alcohol dependence.",
+                        recommendations: [
+                            "Seek immediate professional help",
+                            "Consider detoxification program",
+                            "Join support group like AA"
+                        ]
+                    };
+                }
+            },
+            
+            k10: {
+                key: 'k10', 
+                title: "Kessler Psychological Distress Scale (K10)",
+                description: "Measures non-specific psychological distress.",
+                questions: [
+                    "During the last 30 days, about how often did you feel tired out for no good reason?",
+                    "During the last 30 days, about how often did you feel nervous?",
+                    "During the last 30 days, about how often did you feel so nervous that nothing could calm you down?",
+                    "During the last 30 days, about how often did you feel hopeless?",
+                    "During the last 30 days, about how often did you feel restless or fidgety?",
+                    "During the last 30 days, about how often did you feel so restless you could not sit still?",
+                    "During the last 30 days, about how often did you feel depressed?",
+                    "During the last 30 days, about how often did you feel that everything was an effort?",
+                    "During the last 30 days, about how often did you feel so sad that nothing could cheer you up?",
+                    "During the last 30 days, about how often did you feel worthless?"
+                ],
+                maxScore: 50, 
+                scoring: '1-5',
+                options: ['None of the time (1)', 'A little of the time (2)', 'Some of the time (3)', 'Most of the time (4)', 'All of the time (5)'],
+                interpretation: function(score) {
+                    if (score <= 19) return {
+                        severity: "Low Distress",
+                        level: "low",
+                        description: "You are experiencing low levels of psychological distress.",
+                        recommendations: [
+                            "Continue current practices",
+                            "Maintain healthy lifestyle",
+                            "Regular self-check"
+                        ]
+                    };
+                    if (score <= 24) return {
+                        severity: "Moderate Distress",
+                        level: "moderate",
+                        description: "You are experiencing moderate psychological distress.",
+                        recommendations: [
+                            "Increase self-care activities",
+                            "Consider counseling",
+                            "Stress management techniques"
+                        ]
+                    };
+                    if (score <= 29) return {
+                        severity: "High Distress",
+                        level: "severe",
+                        description: "You are experiencing high levels of psychological distress.",
+                        recommendations: [
+                            "Seek professional help",
+                            "Consider therapy",
+                            "Build support network"
+                        ]
+                    };
+                    return {
+                        severity: "Very High Distress",
+                        level: "severe",
+                        description: "You are experiencing very high levels of psychological distress.",
+                        recommendations: [
+                            "Seek immediate professional help",
+                            "Consider comprehensive treatment",
+                            "Regular monitoring"
+                        ]
+                    };
+                }
+            },
+            
+            pades: {
+                key: 'pades', 
+                title: "PAD Emotion Scales",
+                description: "Measures Pleasure, Arousal, and Dominance dimensions of emotion.",
+                questions: [
+                    "How PLEASURED do you feel right now?",
+                    "How AROUSED do you feel right now?",
+                    "How DOMINANT do you feel right now?"
+                ],
+                maxScore: 15, 
+                scoring: '1-5',
+                options: ['Very Low (1)', 'Low (2)', 'Moderate (3)', 'High (4)', 'Very High (5)'],
+                interpretation: function(responses) {
+                    const [p, a, d] = responses;
+                    const pleasure = p > 3 ? "Positive" : p < 3 ? "Negative" : "Neutral";
+                    const arousal = a > 3 ? "High" : a < 3 ? "Low" : "Moderate";
+                    const dominance = d > 3 ? "Controlling" : d < 3 ? "Controlled" : "Balanced";
+                    
+                    return {
+                        severity: "Emotional State",
+                        level: "low",
+                        description: `Pleasure: ${p}/5 (${pleasure}), Arousal: ${a}/5 (${arousal}), Dominance: ${d}/5 (${dominance})`,
+                        recommendations: [
+                            "Practice emotional awareness",
+                            "Develop emotional regulation skills",
+                            "Consider emotional intelligence training"
+                        ]
+                    };
+                }
+            },
+            
+            poms: {
+                key: 'poms', 
+                title: "Profile of Mood States (POMS) - Short Form",
+                description: "Measures transient, distinct mood states.",
+                questions: [
+                    "Tense",
+                    "Angry",
+                    "Worn out",
+                    "Unhappy",
+                    "Proud",
+                    "Lively",
+                    "Confused",
+                    "Sad",
+                    "Active",
+                    "On edge",
+                    "Grouchy",
+                    "Blue",
+                    "Energetic",
+                    "Nervous",
+                    "Cheerful",
+                    "Annoyed",
+                    "Hopeless",
+                    "Weary",
+                    "Anxious",
+                    "Vigorous",
+                    "Bitter",
+                    "Exhausted",
+                    "Furious",
+                    "Fatigued",
+                    "Alert"
+                ],
+                maxScore: 100, 
+                scoring: '0-4',
+                options: ['Not at all (0)', 'A little (1)', 'Moderately (2)', 'Quite a bit (3)', 'Extremely (4)'],
+                subscales: {
+                    tension: [1, 10, 14, 19],
+                    depression: [4, 8, 12, 17],
+                    anger: [2, 11, 16, 23],
+                    vigor: [6, 13, 20, 25],
+                    fatigue: [3, 18, 22, 24],
+                    confusion: [7, 15, 21]
+                },
+                interpretation: function(scores) {
+                    const totalMoodDisturbance = (scores.tension + scores.depression + scores.anger + scores.fatigue + scores.confusion) - scores.vigor;
+                    
+                    let level = "low";
+                    if (totalMoodDisturbance > 60) level = "severe";
+                    else if (totalMoodDisturbance > 40) level = "moderate";
+                    else if (totalMoodDisturbance > 20) level = "mild";
+                    
+                    return {
+                        severity: "Mood Profile",
+                        level: level,
+                        description: `Total Mood Disturbance: ${totalMoodDisturbance}/148`,
+                        recommendations: [
+                            "Monitor mood patterns weekly",
+                            "Practice mood regulation techniques",
+                            "Consider mindfulness practices"
+                        ]
+                    };
+                }
+            },
+            
+            panas: {
+                key: 'panas', 
+                title: "Positive and Negative Affect Schedule (PANAS)",
+                description: "Measures positive and negative affect.",
+                questions: [
+                    "Interested",
+                    "Distressed",
+                    "Excited",
+                    "Upset",
+                    "Strong",
+                    "Guilty",
+                    "Scared",
+                    "Hostile",
+                    "Enthusiastic",
+                    "Proud",
+                    "Irritable",
+                    "Alert",
+                    "Ashamed",
+                    "Inspired",
+                    "Nervous",
+                    "Determined",
+                    "Attentive",
+                    "Jittery",
+                    "Active",
+                    "Afraid"
+                ],
+                maxScore: 100, 
+                scoring: '1-5',
+                options: ['Very Slightly or Not at All (1)', 'A Little (2)', 'Moderately (3)', 'Quite a Bit (4)', 'Extremely (5)'],
+                positiveItems: [1, 3, 5, 9, 10, 12, 14, 16, 17, 19],
+                negativeItems: [2, 4, 6, 7, 8, 11, 13, 15, 18, 20],
+                interpretation: function(scores) {
+                    const positive = scores.positive;
+                    const negative = scores.negative;
+                    const affectBalance = positive - negative;
+                    
+                    let level = "low";
+                    if (negative > 30) level = "severe";
+                    else if (negative > 20) level = "moderate";
+                    else if (negative > 10) level = "mild";
+                    
+                    return {
+                        severity: "Affect Balance",
+                        level: level,
+                        description: `Positive: ${positive}/50, Negative: ${negative}/50, Balance: ${affectBalance}`,
+                        recommendations: [
+                            "Practice gratitude journaling",
+                            "Develop positive thinking patterns",
+                            "Manage negative emotions effectively"
+                        ]
+                    };
+                }
+            },
+            
+            spane: {
+                key: 'spane', 
+                title: "Scale of Positive and Negative Experience (SPANE)",
+                description: "Measures positive and negative feelings and experiences.",
+                questions: [
+                    "Positive",
+                    "Negative",
+                    "Good",
+                    "Bad",
+                    "Pleasant",
+                    "Unpleasant",
+                    "Happy",
+                    "Sad",
+                    "Afraid",
+                    "Joyful",
+                    "Angry",
+                    "Contented"
+                ],
+                maxScore: 60, 
+                scoring: '1-5',
+                options: ['Very Rarely or Never (1)', 'Rarely (2)', 'Sometimes (3)', 'Often (4)', 'Very Often or Always (5)'],
+                positiveItems: [1, 3, 5, 7, 10, 12],
+                negativeItems: [2, 4, 6, 8, 9, 11],
+                interpretation: function(scores) {
+                    const positive = scores.positive;
+                    const negative = scores.negative;
+                    const balance = positive - negative;
+                    
+                    let level = "low";
+                    if (balance < -10) level = "severe";
+                    else if (balance < 0) level = "moderate";
+                    else if (balance < 10) level = "mild";
+                    
+                    return {
+                        severity: "Experience Balance",
+                        level: level,
+                        description: `Positive: ${positive}/30, Negative: ${negative}/30, Balance: ${balance}`,
+                        recommendations: [
+                            "Increase positive experiences",
+                            "Reduce negative experiences",
+                            "Practice mindfulness and gratitude"
+                        ]
+                    };
+                }
+            },
+            
+            maacl: {
+                key: 'maacl', 
+                title: "MAACL-R Affect Checklist",
+                description: "Measures multiple dimensions of affect and mood.",
+                questions: [
+                    "Happy",
+                    "Sad",
+                    "Energetic",
+                    "Tired",
+                    "Calm",
+                    "Anxious",
+                    "Angry",
+                    "Excited",
+                    "Bored",
+                    "Peaceful",
+                    "Frustrated",
+                    "Relaxed",
+                    "Worried",
+                    "Content",
+                    "Stressed"
+                ],
+                maxScore: 60, 
+                scoring: '1-4',
+                options: ['Not at all (1)', 'A little (2)', 'Moderately (3)', 'Very much (4)'],
+                subscales: {
+                    positive: [1, 3, 5, 8, 10, 12, 14],
+                    negative: [2, 6, 7, 9, 11, 13, 15]
+                },
+                interpretation: function(scores) {
+                    const positive = scores.positive;
+                    const negative = scores.negative;
+                    const ratio = positive / negative;
+                    
+                    let level = "low";
+                    if (ratio < 0.5) level = "severe";
+                    else if (ratio < 1) level = "moderate";
+                    else if (ratio < 1.5) level = "mild";
+                    
+                    return {
+                        severity: "Affect Profile",
+                        level: level,
+                        description: `Positive: ${positive}/28, Negative: ${negative}/28, Ratio: ${ratio.toFixed(2)}`,
+                        recommendations: [
+                            "Balance positive and negative affect",
+                            "Practice affect regulation",
+                            "Engage in mood-enhancing activities"
+                        ]
+                    };
+                }
+            },
+            
+            brums: {
+                key: 'brums', 
+                title: "BRUMS (Brunel Mood Scale)",
+                description: "Measures mood states in athletic and performance contexts.",
+                questions: [
+                    "Angry",
+                    "Worn out",
+                    "Unhappy",
+                    "Nervous",
+                    "Energetic",
+                    "Confused",
+                    "Tired",
+                    "Tense",
+                    "Fatigued",
+                    "Active",
+                    "Annoyed",
+                    "Depressed",
+                    "Weary",
+                    "Anxious",
+                    "Lively"
+                ],
+                maxScore: 60, 
+                scoring: '0-4',
+                options: ['Not at all (0)', 'A little (1)', 'Moderately (2)', 'Quite a bit (3)', 'Extremely (4)'],
+                subscales: {
+                    anger: [1, 11],
+                    depression: [3, 12],
+                    fatigue: [2, 7, 9, 13],
+                    vigor: [5, 10, 15],
+                    tension: [4, 8, 14],
+                    confusion: [6]
+                },
+                interpretation: function(scores) {
+                    const totalMoodDisturbance = (scores.anger + scores.depression + scores.fatigue + scores.tension + scores.confusion) - scores.vigor;
+                    
+                    let level = "low";
+                    if (totalMoodDisturbance > 20) level = "severe";
+                    else if (totalMoodDisturbance > 10) level = "moderate";
+                    else if (totalMoodDisturbance > 5) level = "mild";
+                    
+                    return {
+                        severity: "Athlete Mood Profile",
+                        level: level,
+                        description: `Total Mood Disturbance: ${totalMoodDisturbance}`,
+                        recommendations: [
+                            "Monitor mood-performance relationship",
+                            "Develop pre-performance routines",
+                            "Practice stress management techniques"
+                        ]
+                    };
+                }
+            }
+        };
+
+        // ==================== GLOBAL VARIABLES ====================
+        let currentScale = null;
+        let responses = [];
+        let batchData = [];
+        let uploadedFile = null;
+
+        // ==================== EVENT LISTENERS ====================
+        document.addEventListener('DOMContentLoaded', function() {
+            // Launch button
+            document.getElementById('launchBtn').addEventListener('click', loadScale);
+            
+            // Download template button
+            document.getElementById('downloadTemplateBtn').addEventListener('click', downloadCSVTemplate);
+            
+            // Upload CSV button
+            document.getElementById('uploadCsvBtn').addEventListener('click', function() {
+                document.getElementById('csvFile').click();
+            });
+            
+            // CSV file input
+            document.getElementById('csvFile').addEventListener('change', handleCSV);
+            
+            // Process batch button
+            document.getElementById('processBatchBtn').addEventListener('click', processBatch);
+            
+            // Clear CSV button
+            document.getElementById('clearCsvBtn').addEventListener('click', clearCSV);
+            
+            // Calculate results button
+            document.getElementById('calculateBtn').addEventListener('click', calculateScore);
+            
+            // Reset button
+            document.getElementById('resetBtn').addEventListener('click', resetForm);
+            
+            // Interpretation button
+            document.getElementById('interpretBtn').addEventListener('click', showInterpretation);
+            
+            // Export PDF button
+            document.getElementById('exportPdfBtn').addEventListener('click', exportPDF);
+            
+            // Export DOCX button
+            document.getElementById('exportDocxBtn').addEventListener('click', exportDocx);
+            
+            // New assessment button
+            document.getElementById('newAssessmentBtn').addEventListener('click', startNewAssessment);
+            
+            // Export batch PDF button
+            document.getElementById('exportBatchPdfBtn').addEventListener('click', exportBatchPDF);
+            
+            // Back to CSV button
+            document.getElementById('backToCsvBtn').addEventListener('click', function() {
+                document.getElementById('batchResults').classList.add('hidden');
+                document.getElementById('csvSection').classList.remove('hidden');
+            });
+        });
+
+        // ==================== CORE FUNCTIONS ====================
+        function loadScale() {
+            const select = document.getElementById('scaleSelect');
+            const scaleKey = select.value;
+            
+            if (!scaleKey) {
+                showAlert('Please select a scale from the dropdown', 'warning');
+                return;
+            }
+            
+            // Show loading overlay
+            document.getElementById('loadingOverlay').classList.add('active');
+            
+            // Load scale after short delay for better UX
+            setTimeout(() => {
+                currentScale = scales[scaleKey];
+                
+                if (!currentScale) {
+                    document.getElementById('loadingOverlay').classList.remove('active');
+                    showAlert(`Scale "${scaleKey}" not found. Please select a valid scale.`, 'danger');
+                    return;
+                }
+                
+                // Update UI
+                document.getElementById('scaleTitle').textContent = currentScale.title;
+                document.getElementById('scoringRange').textContent = currentScale.scoring;
+                document.getElementById('questionCount').textContent = currentScale.questions.length;
+                document.getElementById('maxScore').textContent = currentScale.maxScore;
+                
+                // Show sections
+                document.getElementById('csvSection').classList.remove('hidden');
+                document.getElementById('questionnaire').classList.remove('hidden');
+                document.getElementById('results').classList.add('hidden');
+                document.getElementById('batchResults').classList.add('hidden');
+                
+                // Load questions
+                loadQuestions();
+                
+                // Reset progress
+                updateProgress();
+                
+                // Hide loading overlay
+                document.getElementById('loadingOverlay').classList.remove('active');
+                
+                showAlert(`${currentScale.title} loaded successfully!`, 'success');
+            }, 500);
+        }
+
+        function loadQuestions() {
+            const form = document.getElementById('quizForm');
+            form.innerHTML = '';
+            
+            const options = currentScale.options || getDefaultOptions();
+            const maxValue = options.length - 1;
+            
+            currentScale.questions.forEach((question, index) => {
+                const card = document.createElement('div');
+                card.className = 'question-card';
+                
+                card.innerHTML = `
+                    <div style="display: flex; align-items: flex-start; margin-bottom: 15px;">
+                        <div class="question-number">${index + 1}</div>
+                        <div class="question-text">${question}</div>
+                    </div>
+                    <div class="question-options" id="options-${index}"></div>
+                `;
+                
+                const optionsDiv = card.querySelector(`#options-${index}`);
+                
+                options.forEach((optionText, optionIndex) => {
+                    const value = currentScale.scoring.startsWith('1') ? optionIndex + 1 : optionIndex;
+                    
+                    const optionElement = document.createElement('label');
+                    optionElement.className = 'radio-option';
+                    optionElement.innerHTML = `
+                        <input type="radio" name="q${index}" value="${value}" onchange="updateProgress()">
+                        <div class="radio-label">
+                            <div class="radio-value">${value}</div>
+                            <div>${optionText}</div>
+                        </div>
+                    `;
+                    
+                    optionsDiv.appendChild(optionElement);
+                });
+                
+                form.appendChild(card);
+            });
+        }
+
+        function getDefaultOptions() {
+            if (!currentScale) return [];
+            
+            if (currentScale.scoring === '0-4') {
+                return ['Never (0)', 'Almost Never (1)', 'Sometimes (2)', 'Fairly Often (3)', 'Very Often (4)'];
+            } else if (currentScale.scoring === '1-5') {
+                return ['Very Low (1)', 'Low (2)', 'Moderate (3)', 'High (4)', 'Very High (5)'];
+            } else if (currentScale.scoring === '1-4') {
+                return ['Not at all (1)', 'A little (2)', 'Moderately (3)', 'Very much (4)'];
+            } else {
+                return ['Not at all (0)', 'Several days (1)', 'More than half (2)', 'Nearly every day (3)'];
+            }
+        }
+
+        function updateProgress() {
+            if (!currentScale) return;
+            
+            let answered = 0;
+            for (let i = 0; i < currentScale.questions.length; i++) {
+                const selected = document.querySelector(`input[name="q${i}"]:checked`);
+                if (selected) answered++;
+            }
+            
+            const progress = (answered / currentScale.questions.length) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+            document.getElementById('progressText').textContent = `${Math.round(progress)}%`;
+        }
+
+        function calculateScore() {
+            if (!currentScale) return;
+            
+            responses = [];
+            for (let i = 0; i < currentScale.questions.length; i++) {
+                const selected = document.querySelector(`input[name="q${i}"]:checked`);
+                if (!selected) {
+                    showAlert(`Please answer question ${i + 1}`, 'warning');
+                    return;
+                }
+                responses.push(parseInt(selected.value));
+            }
+            
+            const totalScore = calculateTotalScore(responses);
+            const percentage = (totalScore / currentScale.maxScore) * 100;
+            
+            showResults(totalScore, percentage);
+        }
+
+        function calculateTotalScore(responses) {
+            if (!currentScale) return 0;
+            
+            let total = 0;
+            responses.forEach((response, index) => {
+                let value = response;
+                
+                // Handle reverse scoring
+                if (currentScale.reverseItems && currentScale.reverseItems.includes(index + 1)) {
+                    const max = currentScale.scoring === '0-4' ? 4 : 
+                               currentScale.scoring === '1-5' ? 5 : 
+                               currentScale.scoring === '1-4' ? 4 : 3;
+                    value = max - value;
+                }
+                
+                total += value;
+            });
+            
+            return total;
+        }
+
+        function calculateSubscaleScores() {
+            if (!currentScale.subscales) return null;
+            
+            const scores = {};
+            for (const [subscale, indices] of Object.entries(currentScale.subscales)) {
+                let total = 0;
+                indices.forEach(index => {
+                    const response = responses[index - 1] || 0;
+                    let value = response;
+                    
+                    if (currentScale.reverseItems && currentScale.reverseItems.includes(index)) {
+                        const max = currentScale.scoring === '0-4' ? 4 : 
+                                   currentScale.scoring === '1-5' ? 5 : 
+                                   currentScale.scoring === '1-4' ? 4 : 3;
+                        value = max - value;
+                    }
+                    
+                    total += value;
+                });
+                scores[subscale] = total;
+            }
+            
+            return scores;
+        }
+
+        function showResults(totalScore, percentage) {
+            const scoreDisplay = document.getElementById('scoreDisplay');
+            scoreDisplay.innerHTML = `
+                <h3 style="color:var(--dark); margin-bottom:30px; text-align:center;">
+                    <i class="fas fa-award"></i> Assessment Complete
+                </h3>
+                <div class="score-circle" style="--angle: ${percentage * 3.6}deg">
+                    <span>${totalScore}/${currentScale.maxScore}</span>
+                </div>
+                <div style="text-align:center; margin-top:40px;">
+                    <h4 style="color:var(--primary); margin-bottom:15px;">${currentScale.title}</h4>
+                    <p style="color:var(--gray); max-width:600px; margin:0 auto;">
+                        ${currentScale.description}
+                    </p>
+                </div>
+            `;
+            
+            window.currentScore = totalScore;
+            window.currentResponses = responses;
+            
+            document.getElementById('results').classList.remove('hidden');
+            document.getElementById('questionnaire').classList.add('hidden');
+            document.getElementById('interpretationReport').classList.add('hidden');
+            
+            showAlert('Results calculated successfully!', 'success');
+        }
+
+        function showInterpretation() {
+            if (!currentScale || !window.currentScore) {
+                showAlert('Please calculate results first', 'warning');
+                return;
+            }
+            
+            let interpretation;
+            
+            if (currentScale.subscales) {
+                const subscaleScores = calculateSubscaleScores();
+                if (subscaleScores) {
+                    interpretation = currentScale.interpretation(subscaleScores);
+                } else {
+                    interpretation = currentScale.interpretation(window.currentScore);
+                }
+            } else if (currentScale.key === 'pades') {
+                interpretation = currentScale.interpretation(responses);
+            } else {
+                interpretation = currentScale.interpretation(window.currentScore);
+            }
+            
+            let reportContent = `
+                <div class="report-section">
+                    <h4>Score Summary</h4>
+                    <p><strong>Total Score:</strong> ${window.currentScore}/${currentScale.maxScore}</p>
+                    <p><strong>Percentage:</strong> ${Math.round((window.currentScore / currentScale.maxScore) * 100)}%</p>
+                    <p><strong>Assessment Date:</strong> ${new Date().toLocaleDateString()}</p>
+                </div>
+                
+                <div class="report-section">
+                    <h4>Severity Assessment</h4>
+                    <div class="severity-indicator ${interpretation.level}">
+                        ${interpretation.severity}
+                    </div>
+                    <p style="margin-top:15px;">${interpretation.description}</p>
+                </div>
+                
+                <div class="report-section">
+                    <h4>Recommendations</h4>
+                    <ul style="padding-left:20px; margin-top:10px;">
+            `;
+            
+            interpretation.recommendations.forEach(rec => {
+                reportContent += `<li style="margin:10px 0;">${rec}</li>`;
+            });
+            
+            reportContent += `
+                    </ul>
+                </div>
+                
+                <div class="report-section">
+                    <h4>Response Details</h4>
+                    <p>Individual question responses:</p>
+                    <div style="background:#f8f9fa; padding:15px; border-radius:10px; margin-top:10px;">
+            `;
+            
+            responses.forEach((response, index) => {
+                const question = currentScale.questions[index].substring(0, 50) + (currentScale.questions[index].length > 50 ? '...' : '');
+                reportContent += `
+                    <div style="margin:5px 0; padding:8px; border-bottom:1px solid #e9ecef;">
+                        <strong>Q${index + 1}:</strong> ${response} - ${question}
+                    </div>
+                `;
+            });
+            
+            reportContent += `
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('reportContent').innerHTML = reportContent;
+            document.getElementById('interpretationReport').classList.remove('hidden');
+            
+            showAlert('Detailed analysis generated', 'info');
+        }
+
+        function downloadCSVTemplate() {
+            if (!currentScale) {
+                showAlert('Please load a scale first', 'warning');
+                return;
+            }
+            
+            try {
+                // Create headers
+                const headers = ['ParticipantID', 'Date', 'Notes'];
+                for (let i = 0; i < currentScale.questions.length; i++) {
+                    headers.push(`Q${i + 1}`);
+                }
+                
+                // Create sample data
+                const rows = [headers.join(',')];
+                
+                // Add sample participants
+                for (let p = 1; p <= 5; p++) {
+                    const rowData = [`P${p}`, new Date().toISOString().split('T')[0], `Sample Participant ${p}`];
+                    
+                    // Add sample responses
+                    for (let i = 0; i < currentScale.questions.length; i++) {
+                        // Generate sample scores based on scale type
+                        let sampleScore;
+                        if (currentScale.scoring === '0-4') {
+                            sampleScore = Math.floor(Math.random() * 5); // 0-4
+                        } else if (currentScale.scoring === '1-5') {
+                            sampleScore = Math.floor(Math.random() * 5) + 1; // 1-5
+                        } else if (currentScale.scoring === '1-4') {
+                            sampleScore = Math.floor(Math.random() * 4) + 1; // 1-4
+                        } else {
+                            sampleScore = Math.floor(Math.random() * 4); // 0-3
+                        }
+                        rowData.push(sampleScore);
+                    }
+                    
+                    rows.push(rowData.join(','));
+                }
+                
+                // Create CSV content
+                const csvContent = rows.join('\n');
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                
+                a.href = url;
+                a.download = `MindMetrics_${currentScale.key}_Template.csv`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                showAlert('Template downloaded successfully!', 'success');
+                
+            } catch (error) {
+                console.error('Error downloading template:', error);
+                showAlert('Error downloading template', 'danger');
+            }
+        }
+
+        function handleCSV(event) {
+            const file = event.target.files[0];
+            if (!file || !currentScale) return;
+            
+            uploadedFile = file; // Store the file for processing
+            
+            document.getElementById('fileName').textContent = file.name;
+            document.getElementById('batchControls').classList.remove('hidden');
+            
+            // Preview CSV file
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const content = e.target.result;
+                const lines = content.split('\n').slice(0, 6); // Show first 6 lines
+                
+                let previewHTML = '<table style="width:100%; border-collapse:collapse; border:1px solid #e2e8f0; margin-top:10px;">';
+                
+                lines.forEach((line, index) => {
+                    const cells = line.split(',');
+                    previewHTML += '<tr>';
+                    cells.forEach((cell, cellIndex) => {
+                        if (index === 0) {
+                            previewHTML += `<th style="border:1px solid #e2e8f0; padding:8px; background:#f8fafc;">${cell}</th>`;
+                        } else {
+                            previewHTML += `<td style="border:1px solid #e2e8f0; padding:8px;">${cell}</td>`;
+                        }
+                    });
+                    previewHTML += '</tr>';
+                });
+                
+                previewHTML += '</table>';
+                document.getElementById('previewTable').innerHTML = previewHTML;
+                document.getElementById('csvPreview').classList.remove('hidden');
+                
+                showAlert('CSV file loaded successfully. Click "Process Batch File" to analyze.', 'info');
+            };
+            
+            reader.readAsText(file);
+        }
+
+        function processBatch() {
+            if (!uploadedFile || !currentScale) {
+                showAlert('Please upload a CSV file first', 'warning');
+                return;
+            }
+            
+            // Show loading overlay
+            document.getElementById('loadingOverlay').classList.add('active');
+            
+            // Process the file after a short delay for better UX
+            setTimeout(() => {
+                try {
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(e) {
+                        try {
+                            const content = e.target.result;
+                            const lines = content.split('\n').filter(line => line.trim() !== '');
+                            
+                            if (lines.length < 2) {
+                                throw new Error('CSV file is empty or has no data rows');
+                            }
+                            
+                            // Parse CSV data
+                            batchData = [];
+                            const headers = lines[0].split(',');
+                            
+                            // Process each data row
+                            for (let i = 1; i < lines.length; i++) {
+                                const row = lines[i].split(',');
+                                
+                                // Extract responses
+                                const responses = [];
+                                for (let q = 0; q < currentScale.questions.length; q++) {
+                                    const headerIndex = 3 + q; // Skip ParticipantID, Date, Notes
+                                    if (headerIndex < row.length) {
+                                        const value = parseInt(row[headerIndex]) || 0;
+                                        responses.push(value);
+                                    } else {
+                                        responses.push(0); // Default value if missing
+                                    }
+                                }
+                                
+                                // Calculate score
+                                const totalScore = calculateTotalScore(responses);
+                                
+                                // Get interpretation
+                                let interpretation;
+                                if (currentScale.subscales) {
+                                    // For scales with subscales, we need to calculate subscale scores
+                                    const subscaleScores = {};
+                                    for (const [subscale, indices] of Object.entries(currentScale.subscales)) {
+                                        let subTotal = 0;
+                                        indices.forEach(index => {
+                                            const response = responses[index - 1] || 0;
+                                            subTotal += response;
+                                        });
+                                        subscaleScores[subscale] = subTotal;
+                                    }
+                                    interpretation = currentScale.interpretation(subscaleScores);
+                                } else if (currentScale.key === 'pades') {
+                                    interpretation = currentScale.interpretation(responses);
+                                } else {
+                                    interpretation = currentScale.interpretation(totalScore);
+                                }
+                                
+                                // Create participant object
+                                const participant = {
+                                    id: row[0] || `P${i}`,
+                                    date: row[1] || new Date().toISOString().split('T')[0],
+                                    notes: row[2] || '',
+                                    responses: responses,
+                                    score: totalScore,
+                                    interpretation: interpretation
+                                };
+                                
+                                batchData.push(participant);
+                            }
+                            
+                            // Hide loading overlay
+                            document.getElementById('loadingOverlay').classList.remove('active');
+                            
+                            // Display results
+                            displayBatchResults();
+                            
+                            showAlert(`Successfully processed ${batchData.length} participants!`, 'success');
+                            
+                        } catch (error) {
+                            document.getElementById('loadingOverlay').classList.remove('active');
+                            showAlert(`Error processing CSV: ${error.message}`, 'danger');
+                            console.error('CSV processing error:', error);
+                        }
+                    };
+                    
+                    reader.onerror = function() {
+                        document.getElementById('loadingOverlay').classList.remove('active');
+                        showAlert('Error reading file', 'danger');
+                    };
+                    
+                    reader.readAsText(uploadedFile);
+                    
+                } catch (error) {
+                    document.getElementById('loadingOverlay').classList.remove('active');
+                    showAlert(`Error: ${error.message}`, 'danger');
+                    console.error('Process batch error:', error);
+                }
+            }, 500);
+        }
+
+        function displayBatchResults() {
+            // Hide other sections
+            document.getElementById('csvSection').classList.add('hidden');
+            document.getElementById('questionnaire').classList.add('hidden');
+            document.getElementById('results').classList.add('hidden');
+            
+            // Show batch results section
+            document.getElementById('batchResults').classList.remove('hidden');
+            
+            // Calculate summary statistics
+            const scores = batchData.map(p => p.score);
+            const avgScore = scores.reduce((a, b) => a + b, 0) / scores.length;
+            const minScore = Math.min(...scores);
+            const maxScore = Math.max(...scores);
+            
+            // Count severity levels
+            const severityCounts = {
+                low: 0,
+                mild: 0,
+                moderate: 0,
+                severe: 0
+            };
+            
+            batchData.forEach(participant => {
+                severityCounts[participant.interpretation.level]++;
+            });
+            
+            // Build summary HTML
+            let summaryHTML = `
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i>
+                    <div>
+                        <strong>Batch Processing Complete</strong><br>
+                        ${batchData.length} participants analyzed
+                    </div>
+                </div>
+                
+                <div class="scale-info">
+                    <div class="scale-info-item">
+                        <div>Average Score</div>
+                        <div style="font-weight:600; color:var(--primary); font-size:1.2em;">${avgScore.toFixed(1)}/${currentScale.maxScore}</div>
+                    </div>
+                    <div class="scale-info-item">
+                        <div>Score Range</div>
+                        <div style="font-weight:600; color:var(--primary); font-size:1.2em;">${minScore} - ${maxScore}</div>
+                    </div>
+                    <div class="scale-info-item">
+                        <div>Low Risk</div>
+                        <div style="font-weight:600; color:var(--success); font-size:1.2em;">${severityCounts.low}</div>
+                    </div>
+                    <div class="scale-info-item">
+                        <div>Need Attention</div>
+                        <div style="font-weight:600; color:var(--warning); font-size:1.2em;">${severityCounts.moderate + severityCounts.severe}</div>
+                    </div>
+                </div>
+                
+                <div style="margin:30px 0; padding:20px; background:#f8fafc; border-radius:10px;">
+                    <h4 style="color:var(--dark); margin-bottom:15px;">Severity Distribution</h4>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                        <div style="flex:1; min-width:150px; background:var(--success); color:white; padding:10px; border-radius:8px; text-align:center;">
+                            <div style="font-size:1.5em; font-weight:bold;">${severityCounts.low}</div>
+                            <div>Low</div>
+                        </div>
+                        <div style="flex:1; min-width:150px; background:#8b5cf6; color:white; padding:10px; border-radius:8px; text-align:center;">
+                            <div style="font-size:1.5em; font-weight:bold;">${severityCounts.mild}</div>
+                            <div>Mild</div>
+                        </div>
+                        <div style="flex:1; min-width:150px; background:var(--warning); color:white; padding:10px; border-radius:8px; text-align:center;">
+                            <div style="font-size:1.5em; font-weight:bold;">${severityCounts.moderate}</div>
+                            <div>Moderate</div>
+                        </div>
+                        <div style="flex:1; min-width:150px; background:var(--danger); color:white; padding:10px; border-radius:8px; text-align:center;">
+                            <div style="font-size:1.5em; font-weight:bold;">${severityCounts.severe}</div>
+                            <div>Severe</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('batchSummary').innerHTML = summaryHTML;
+            
+            // Build individual results table
+            let resultsHTML = `
+                <h3 style="color:var(--dark); margin:30px 0 20px 0;">Individual Results</h3>
+                <div style="overflow-x: auto;">
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Date</th>
+                                <th>Score</th>
+                                <th>Severity</th>
+                                <th>Notes</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            batchData.forEach((participant, index) => {
+                const severityClass = participant.interpretation.level;
+                const severityText = participant.interpretation.severity;
+                
+                resultsHTML += `
+                    <tr>
+                        <td><strong>${participant.id}</strong></td>
+                        <td>${participant.date}</td>
+                        <td><span style="font-weight:700; color:var(--primary);">${participant.score}/${currentScale.maxScore}</span></td>
+                        <td><span class="severity-indicator ${severityClass}" style="padding:5px 15px; font-size:0.9em;">${severityText}</span></td>
+                        <td>${participant.notes || '-'}</td>
+                        <td>
+                            <button class="btn" style="padding:5px 15px; font-size:0.9em; min-width:auto;" 
+                                    onclick="viewIndividualResult(${index})">
+                                <i class="fas fa-eye"></i> View Details
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            resultsHTML += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            document.getElementById('individualBatchResults').innerHTML = resultsHTML;
+        }
+
+        function viewIndividualResult(index) {
+            const participant = batchData[index];
+            
+            // Set as current responses
+            responses = participant.responses;
+            window.currentScore = participant.score;
+            window.currentResponses = participant.responses;
+            
+            // Show individual results
+            showResults(participant.score, (participant.score / currentScale.maxScore) * 100);
+            
+            // Show interpretation
+            setTimeout(() => {
+                showInterpretation();
+            }, 100);
+        }
+
+        function exportPDF() {
+            if (!currentScale || !window.currentScore) {
+                showAlert('Please complete an assessment first', 'warning');
+                return;
+            }
+            
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                const margin = 20;
+                let y = margin;
+                
+                // Title
+                doc.setFontSize(20);
+                doc.setTextColor(99, 102, 241);
+                doc.text(`${currentScale.title} - Assessment Report`, margin, y);
+                y += 15;
+                
+                // Assessment info
+                doc.setFontSize(12);
+                doc.setTextColor(50, 50, 50);
+                doc.text(`Assessment Date: ${new Date().toLocaleDateString()}`, margin, y);
+                y += 8;
+                doc.text(`Score: ${window.currentScore}/${currentScale.maxScore}`, margin, y);
+                y += 15;
+                
+                // Get interpretation
+                let interpretation;
+                if (currentScale.subscales) {
+                    const subscaleScores = calculateSubscaleScores();
+                    if (subscaleScores) {
+                        interpretation = currentScale.interpretation(subscaleScores);
+                    } else {
+                        interpretation = currentScale.interpretation(window.currentScore);
+                    }
+                } else if (currentScale.key === 'pades') {
+                    interpretation = currentScale.interpretation(responses);
+                } else {
+                    interpretation = currentScale.interpretation(window.currentScore);
+                }
+                
+                // Severity
+                doc.setFontSize(14);
+                doc.setTextColor(30, 41, 59);
+                doc.text('Severity Assessment:', margin, y);
+                y += 10;
+                
+                doc.setFontSize(12);
+                doc.setTextColor(30, 41, 59);
+                doc.text(interpretation.severity + ': ' + interpretation.description, margin, y, { maxWidth: 170 });
+                y += 20;
+                
+                // Recommendations
+                if (y > 200) {
+                    doc.addPage();
+                    y = margin;
+                }
+                
+                doc.setFontSize(14);
+                doc.text('Recommendations:', margin, y);
+                y += 10;
+                
+                doc.setFontSize(11);
+                interpretation.recommendations.forEach((rec, i) => {
+                    doc.text(`${i + 1}. ${rec}`, margin, y, { maxWidth: 170 });
+                    y += 7;
+                });
+                
+                y += 10;
+                
+                // Responses
+                if (y > 180) {
+                    doc.addPage();
+                    y = margin;
+                }
+                
+                doc.setFontSize(14);
+                doc.text('Question Responses:', margin, y);
+                y += 10;
+                
+                doc.setFontSize(10);
+                responses.forEach((response, i) => {
+                    const question = currentScale.questions[i];
+                    const displayText = `Q${i + 1}: ${response} - ${question.substring(0, 50)}...`;
+                    doc.text(displayText, margin, y, { maxWidth: 170 });
+                    y += 6;
+                    
+                    if (y > 280 && i < responses.length - 1) {
+                        doc.addPage();
+                        y = margin;
+                    }
+                });
+                
+                // Footer
+                doc.setFontSize(9);
+                doc.setTextColor(150, 150, 150);
+                doc.text('This report is for screening purposes only. Consult a healthcare professional for diagnosis.', margin, 285);
+                
+                doc.save(`${currentScale.key}_assessment_report.pdf`);
+                
+                showAlert('PDF report exported successfully!', 'success');
+                
+            } catch (error) {
+                console.error('Error exporting PDF:', error);
+                showAlert('Error exporting PDF report', 'danger');
+            }
+        }
+
+        function exportBatchPDF() {
+            if (!currentScale || batchData.length === 0) {
+                showAlert('No batch data to export', 'warning');
+                return;
+            }
+            
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                const margin = 20;
+                let y = margin;
+                
+                // Title
+                doc.setFontSize(20);
+                doc.setTextColor(99, 102, 241);
+                doc.text(`${currentScale.title} - Batch Report`, margin, y);
+                y += 15;
+                
+                // Batch info
+                doc.setFontSize(12);
+                doc.setTextColor(50, 50, 50);
+                doc.text(`Report Date: ${new Date().toLocaleDateString()}`, margin, y);
+                y += 8;
+                doc.text(`Total Participants: ${batchData.length}`, margin, y);
+                y += 15;
+                
+                // Summary statistics
+                const scores = batchData.map(p => p.score);
+                const avgScore = scores.reduce((a, b) => a + b, 0) / scores.length;
+                const minScore = Math.min(...scores);
+                const maxScore = Math.max(...scores);
+                
+                doc.setFontSize(14);
+                doc.setTextColor(30, 41, 59);
+                doc.text('Summary Statistics:', margin, y);
+                y += 10;
+                
+                doc.setFontSize(12);
+                doc.text(`Average Score: ${avgScore.toFixed(1)}/${currentScale.maxScore}`, margin, y);
+                y += 8;
+                doc.text(`Score Range: ${minScore} - ${maxScore}`, margin, y);
+                y += 15;
+                
+                // Individual results
+                doc.setFontSize(16);
+                doc.text('Individual Results:', margin, y);
+                y += 10;
+                
+                doc.setFontSize(10);
+                batchData.forEach((participant, index) => {
+                    if (y > 250) {
+                        doc.addPage();
+                        y = margin;
+                    }
+                    
+                    doc.text(`Participant ${participant.id}: ${participant.score}/${currentScale.maxScore} (${participant.interpretation.severity})`, margin, y);
+                    y += 7;
+                    
+                    if (participant.notes) {
+                        doc.text(`Notes: ${participant.notes}`, margin + 10, y);
+                        y += 7;
+                    }
+                    
+                    y += 5;
+                });
+                
+                // Footer
+                doc.setFontSize(9);
+                doc.setTextColor(150, 150, 150);
+                doc.text('This report is for screening purposes only. Consult a healthcare professional for diagnosis.', margin, 285);
+                
+                doc.save(`${currentScale.key}_batch_report.pdf`);
+                
+                showAlert('Batch PDF report exported successfully!', 'success');
+                
+            } catch (error) {
+                console.error('Error exporting batch PDF:', error);
+                showAlert('Error exporting batch report', 'danger');
+            }
+        }
+
+        function exportDocx() {
+            if (!currentScale || !window.currentScore) {
+                showAlert('Please complete an assessment first', 'warning');
+                return;
+            }
+            
+            try {
+                const { Document, Packer, Paragraph, TextRun, HeadingLevel } = docx;
+                
+                // Get interpretation
+                let interpretation;
+                if (currentScale.subscales) {
+                    const subscaleScores = calculateSubscaleScores();
+                    if (subscaleScores) {
+                        interpretation = currentScale.interpretation(subscaleScores);
+                    } else {
+                        interpretation = currentScale.interpretation(window.currentScore);
+                    }
+                } else if (currentScale.key === 'pades') {
+                    interpretation = currentScale.interpretation(responses);
+                } else {
+                    interpretation = currentScale.interpretation(window.currentScore);
+                }
+                
+                const doc = new Document({
+                    sections: [{
+                        properties: {},
+                        children: [
+                            new Paragraph({
+                                text: "MindMetrics Assessment Report",
+                                heading: HeadingLevel.TITLE,
+                                spacing: { after: 200 }
+                            }),
+                            
+                            new Paragraph({
+                                text: currentScale.title,
+                                heading: HeadingLevel.HEADING_1,
+                                spacing: { after: 200 }
+                            }),
+                            
+                            new Paragraph({
+                                children: [
+                                    new TextRun({
+                                        text: `Assessment Date: ${new Date().toLocaleDateString()}`,
+                                        bold: true
+                                    })
+                                ],
+                                spacing: { after: 100 }
+                            }),
+                            
+                            new Paragraph({
+                                children: [
+                                    new TextRun({
+                                        text: `Score: ${window.currentScore}/${currentScale.maxScore}`,
+                                        bold: true
+                                    })
+                                ],
+                                spacing: { after: 200 }
+                            }),
+                            
+                            new Paragraph({
+                                text: "Severity Assessment",
+                                heading: HeadingLevel.HEADING_2,
+                                spacing: { after: 100 }
+                            }),
+                            
+                            new Paragraph({
+                                children: [
+                                    new TextRun({
+                                        text: interpretation.severity + ": ",
+                                        bold: true
+                                    }),
+                                    new TextRun(interpretation.description)
+                                ],
+                                spacing: { after: 200 }
+                            }),
+                            
+                            new Paragraph({
+                                text: "Recommendations",
+                                heading: HeadingLevel.HEADING_2,
+                                spacing: { after: 100 }
+                            }),
+                            
+                            ...interpretation.recommendations.map(rec => 
+                                new Paragraph({
+                                    text: `• ${rec}`,
+                                    spacing: { after: 50 }
+                                })
+                            ),
+                            
+                            new Paragraph({
+                                text: "Question Responses",
+                                heading: HeadingLevel.HEADING_2,
+                                spacing: { before: 200, after: 100 }
+                            }),
+                            
+                            ...responses.map((response, i) => 
+                                new Paragraph({
+                                    text: `Q${i + 1}: ${response} - ${currentScale.questions[i]}`,
+                                    spacing: { after: 50 }
+                                })
+                            ),
+                            
+                            new Paragraph({
+                                text: "Disclaimer: This report is for screening purposes only. Consult a qualified healthcare professional for proper diagnosis and treatment.",
+                                spacing: { before: 300 }
+                            })
+                        ]
+                    }]
+                });
+                
+                Packer.toBlob(doc).then(blob => {
+                    saveAs(blob, `${currentScale.key}_assessment_report.docx`);
+                });
+                
+                showAlert('DOCX report exported successfully!', 'success');
+                
+            } catch (error) {
+                console.error('Error exporting DOCX:', error);
+                showAlert('Error exporting DOCX report', 'danger');
+            }
+        }
+
+        function resetForm() {
+            const form = document.getElementById('quizForm');
+            const radios = form.querySelectorAll('input[type="radio"]');
+            radios.forEach(radio => radio.checked = false);
+            updateProgress();
+            showAlert('Form reset successfully', 'info');
+        }
+
+        function clearCSV() {
+            document.getElementById('csvFile').value = '';
+            document.getElementById('fileName').textContent = 'No file chosen';
+            document.getElementById('csvPreview').classList.add('hidden');
+            document.getElementById('batchControls').classList.add('hidden');
+            document.getElementById('previewTable').innerHTML = '';
+            uploadedFile = null;
+            showAlert('CSV file cleared', 'info');
+        }
+
+        function startNewAssessment() {
+            document.getElementById('scaleSelect').value = '';
+            document.getElementById('questionnaire').classList.add('hidden');
+            document.getElementById('results').classList.add('hidden');
+            document.getElementById('csvSection').classList.add('hidden');
+            document.getElementById('batchResults').classList.add('hidden');
+            document.getElementById('interpretationReport').classList.add('hidden');
+            resetForm();
+            clearCSV();
+            currentScale = null;
+            responses = [];
+            batchData = [];
+            showAlert('Ready for new assessment', 'info');
+        }
+
+        function showAlert(message, type) {
+            // Remove existing alerts
+            const existingAlerts = document.querySelectorAll('.alert');
+            existingAlerts.forEach(alert => {
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 300);
+            });
+            
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 
+                                  type === 'warning' ? 'exclamation-triangle' : 
+                                  type === 'danger' ? 'times-circle' : 'info-circle'}"></i>
+                <div>${message}</div>
+            `;
+            
+            document.querySelector('.content').insertBefore(alertDiv, document.querySelector('.content').firstChild);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.style.opacity = '0';
+                    setTimeout(() => alertDiv.remove(), 300);
+                }
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
